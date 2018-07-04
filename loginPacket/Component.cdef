@@ -1,0 +1,13 @@
+requires:
+{
+	api:
+	{
+		le_data.api
+		modemServices/le_mrc.api
+	}
+}
+
+sources:
+{
+	loginPacket.c
+}

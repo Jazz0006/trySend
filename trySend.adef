@@ -1,0 +1,21 @@
+version: 1.0.0
+maxFileSystemBytes: 512K
+
+executables:
+{
+	trySend = (loginPacket)
+}
+
+processes:
+{
+	run:
+	{
+		(trySend)
+	}
+}
+
+bindings:
+{
+	trySend.loginPacket.le_data -> dataConnectionService.le_data
+	trySend.loginPacket.le_mrc -> modemService.le_mrc
+}

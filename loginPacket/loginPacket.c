@@ -81,7 +81,7 @@ static void NetRegStateHandler
 //    }
 
     // For traceablity, make sure that this event is recorded.
-    LE_DEBUG("%s", GetNetStateString(state));
+    LE_DEBUG("Jazz: Network status changed!! %s", GetNetStateString(state));
 
     // If we are going back on net, and have been configured to do so, send our "on network" message
     // now.
@@ -128,7 +128,7 @@ static const u16 crctab16[] =
 0X7BC7, 0X6A4E, 0X58D5, 0X495C, 0X3DE3, 0X2C6A, 0X1EF1, 0X0F78,
 };
 
-u16 GetCrc16(char* pData, int nLength)
+u16 GetCrc16(u8* pData, int nLength)
 {
 u16 fcs = 0xffff;
 while(nLength>0){
@@ -164,7 +164,7 @@ COMPONENT_INIT
 
 
 	LE_INFO("Jazz's Program Started");
-	unsigned char loginPacket[36] = {0};
+	unsigned char loginPacket[18] = {0};
 	u16 numSequence; // sequence number in packet.
 
 	loginPacket[0] = 0x78;
@@ -185,24 +185,21 @@ COMPONENT_INIT
 	loginPacket[13] = numSequence&0xFF; //low 8 bit of numSequence
 
 	//Now calculate the checksum
-	char *forCrc = {"0"};
 	u8 *pLoginPacket;
 	pLoginPacket = loginPacket;
-	memcpy(forCrc, pLoginPacket + 2, 12);
-
-	for (int i=0; i<12 ; i++)
-			LE_INFO("CRC Packet: %x", *forCrc + i);
-
-	u16 crcResult = GetCrc16(forCrc, 12);
+	u16 crcResult = GetCrc16(pLoginPacket+2, 12);
 
 	loginPacket[14] = crcResult>>8; //high 8 bit of crc result
 	loginPacket[15] = crcResult&0xFF; //low 8 bit of crc result
 
-	for (int i=0; i<14 ; i++)
+	loginPacket[16] = 0x0d;
+	loginPacket[17] = 0x0a;
+
+	for (int i=0; i<16 ; i++)
 		LE_INFO("Login Packet: %x", loginPacket[i]);
 
 	free(numSerialNumberArray);
-	while(1);
+
 
     // register network state handler
     le_mrc_AddNetRegStateEventHandler(NetRegStateHandler, NULL);

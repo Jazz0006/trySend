@@ -230,7 +230,7 @@ COMPONENT_INIT
 	sleep(5);//Wait for 5 seconds, so the data connection is ready
 
 	//char* loginString;
-	char* recvBuffer={"0"};
+	char recvBuffer[30];
 	int sockFd = 0;
 	struct sockaddr_in servAddr;
 
@@ -258,9 +258,18 @@ COMPONENT_INIT
 		snprintf(buffer, BUFFER_SIZE,
 				"Connection to www.sierrawireless.com was successful.");
 
-		send(sockFd, loginPacket, 7, 0);
-		recv(sockFd, recvBuffer, 30, 0);
-		LE_INFO("Received reply\n");
+		send(sockFd, loginPacket, 18, 0);
+		int recvLen;
+		recvLen = recv(sockFd, recvBuffer, 30, 0);
+		if(recvLen==-1)
+		{
+			LE_INFO("ERROR!!! %s",strerror(errno));
+			LE_INFO("Error Number is %d", errno);
+		}
+		LE_INFO("Received %d byte reply.", recvLen);
+
+		for (int i=0; i<recvLen ; i++)
+			LE_INFO("Reply Packet: %x", recvBuffer[i]);
 	}
 
 	close(sockFd);
